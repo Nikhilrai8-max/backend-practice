@@ -22,4 +22,11 @@ import userRoutes from './routes/user.routes.js';
 
 // routes declaration
 app.use("/api/v1/users", userRoutes) 
+// global error handler
+app.use((err, req, res, next) => {
+    console.error(err);
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    res.status(statusCode).json({ status: 'error', message });
+});
 export default app;

@@ -46,14 +46,11 @@ const userSchema = new mongoose.Schema({
    
 }, { timestamps: true });
 //we used pre save hook to hash the password before saving the user to the database and we used bcrypt to hash the password and we used 10 rounds to hash the password and we used async await to hash the password because hashing is a time consuming process and we want to avoid blocking the event loop while hashing the password and we used next() to move to the next middleware after hashing the password and we used isModified() method to check if the password is modified or not because if the password is not modified then we don't need to hash the password again and we can just move to the next middleware without hashing the password again.
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) {
-        return next();
+        return;
     }
-    else{
-        this.password = await bcrypt.hash(this.password, 10);
-        return next();
-    }
+    this.password = await bcrypt.hash(this.password, 10);
 });
 //we used method to compare the password with the hashed password in the database and we used bcrypt to compare the password and we used async await to compare the password because comparing is a time consuming process and we want to avoid blocking the event loop while comparing the password and we return true if the password is correct and false if the password is incorrect.
 userSchema.methods.comparePassword = async function (password) {
