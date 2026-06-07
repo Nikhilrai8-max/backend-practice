@@ -123,7 +123,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
     
-    const refreshAcessToken = asyncHandler(async (req, res) => {
+const refreshAcessToken = asyncHandler(async (req, res) => {
         const incoimingrefreshToken = req.cookies.refreshToken || req.body.refreshToken
         if(!incoimingrefreshToken){
             throw new ApiError(400, "Refresh token is required");
@@ -149,4 +149,33 @@ const logoutUser = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Invalid refresh token");   
     } 
     });
+
+ 
+    
+const changeCurrentPassword = asysncHandler(async (req, res) => {
+    // get the user id from the request object which is added by the auth middleware
+    // get the current password and new password from the request body
+    // validation of the current password and new password like whether they are missing or not
+    // find the user in the database using the user id
+    // if user not found than send error response to the frontend
+    // if user found than compare the current password with the hashed password in the database
+    // if current password is incorrect than send error response to the frontend
+    // if current password is correct than hash the new password and save it in the database and send success response to the frontend
+    const {oldPassword , newPassword} = req.body;
+    if(!oldPassword || !newPassword){
+        throw new ApiError(400, "Please provide old password and new password");
+    }
+    const user = await User.findById(req.user._id);
+    if(!user){
+        throw new ApiError(404, "User not found");
+    }
+    const isPasswordValid = await user.comparePassword(oldPassword);
+    if(!isPasswordValid){
+        throw new ApiError(400, "Invalid current password");
+    }
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false });
+
+})
+
 export { registerUser, loginUser, logoutUser, refreshAcessToken };
